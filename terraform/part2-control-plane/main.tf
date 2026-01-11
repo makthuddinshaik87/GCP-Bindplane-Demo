@@ -40,9 +40,9 @@ resource "google_compute_instance" "control_plane" {
 
   # Startup script: install Bindplane Control Plane and configure DB
   # IMPORTANT:
-  # - Use <<-EOF (not HTML &lt;&lt;EOF)
-  # - Use "${var.*}" (not $var.*)
-  # - Quote all interpolations
+  # - Use <<-EOF (literal) – not HTML &lt;&lt;EOF.
+  # - Use "${var.*}" for HCL interpolation – not $var.*.
+  # - Quote all interpolations for safety.
   metadata_startup_script = <<-EOF
     #!/bin/bash
     set -euo pipefail
@@ -88,3 +88,4 @@ output "control_plane_ip" {
   description = "Public IP of BindPlane Control Plane"
   value       = google_compute_instance.control_plane.network_interface[0].access_config[0].nat_ip
 }
+``
