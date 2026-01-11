@@ -150,6 +150,15 @@ jobs:
           terraform fmt -recursive
           terraform validate
 
+      - name: DEBUG – show main.tf exactly
+        working-directory: terraform/part2-control-plane
+        run: |
+           pwd
+           echo "===== LIST FILES ====="
+           ls -l
+           echo "===== SHOW main.tf ====="
+           nl -ba main.tf | sed -n '1,120p'
+
       - name: Terraform Init – Control Plane
         working-directory: terraform/part2-control-plane
         env:
