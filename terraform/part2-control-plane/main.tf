@@ -7,7 +7,7 @@ provider "google" {
 }
 
 ############################################
-# Read Cloud SQL outputs from Part 1
+# Read Cloud SQL details from Part 1
 ############################################
 data "terraform_remote_state" "db" {
   backend = "gcs"
@@ -22,7 +22,7 @@ data "terraform_remote_state" "db" {
 ############################################
 resource "google_compute_instance" "control_plane" {
   name         = "bp-control-plane"
-  machine_type = "e2-micro"          # demo / free-tier friendly
+  machine_type = "e2-micro"
   zone         = "us-central1-a"
 
   boot_disk {
@@ -44,7 +44,7 @@ set -e
 echo "Installing BindPlane Control Plane..."
 curl -sSL https://observiq.com/install-bindplane.sh | bash
 
-echo "Configuring BindPlane with Cloud SQL PostgreSQL..."
+echo "Configuring BindPlane with Cloud SQL..."
 
 bindplane setup \
   --db-host ${data.terraform_remote_state.db.outputs.db_ip} \
@@ -54,11 +54,11 @@ bindplane setup \
   --db-name ${data.terraform_remote_state.db.outputs.db_name} \
   --admin-password ${var.admin_password}
 
-echo "BindPlane Control Plane setup completed"
-
-# Create API key locally on the VM (not exposed to Terraform)
+echo "Creating agent API key locally on Control Plane..."
 bindplane api-keys create demo-agent --json | jq -r '.key' > /opt/bindplane/agent-api.key
 chmod 600 /opt/bindplane/agent-api.key
+
+echo "BindPlane Control Plane setup completed"
 EOF
 }
 
