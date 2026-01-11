@@ -1,7 +1,21 @@
 variable "project_id" {
-  type = string
+  description = "GCP Project ID"
+  type        = string
 }
 
 variable "region" {
-  type = string
+  description = "GCP region"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Cloud SQL PostgreSQL password"
+  type        = string
+  sensitive   = true
+}
+
+variable "admin_password" {
+  description = "BindPlane admin password"
+  type        = string
+  sensitive   = true
 }
