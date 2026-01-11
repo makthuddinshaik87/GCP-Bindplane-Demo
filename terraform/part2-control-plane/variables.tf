@@ -8,7 +8,7 @@ variable "region" {
   type        = string
 }
 
-variable "db_password" {
+variable "DB_PASSWORD" {
   description = "Cloud SQL PostgreSQL password"
   type        = string
   sensitive   = true
