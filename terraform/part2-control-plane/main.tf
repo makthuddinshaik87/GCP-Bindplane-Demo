@@ -38,19 +38,19 @@ resource "google_compute_instance" "control_plane" {
     access_config {} # ephemeral public IP
   }
 
-  # IMPORTANT:
-  # - Proper heredoc <<-EOF (not HTML-escaped)
-  # - HCL interpolation "${...}" (not $var...)
-  # - Quotes around interpolated values
+  # Startup script: install Bindplane Control Plane and configure DB
   metadata_startup_script = <<-EOF
     #!/bin/bash
     set -euo pipefail
+
+    # Basic dependencies (jq used below)
+    apt-get update -y
+    apt-get install -y jq curl
 
     echo "Installing BindPlane Control Plane..."
     curl -sSL https://observiq.com/install-bindplane.sh | bash
 
     echo "Configuring BindPlane with Cloud SQL..."
-
     bindplane setup \
       --db-host "${data.terraform_remote_state.db.outputs.db_ip}" \
       --db-port "${data.terraform_remote_state.db.outputs.db_port}" \
@@ -66,6 +66,19 @@ resource "google_compute_instance" "control_plane" {
 
     echo "BindPlane Control Plane setup completed"
   EOF
+
+  # (Optional) if you plan to read secrets from GCP inside the VM later
+  service_account {
+    # email = google_service_account.cp_sa.email  # uncomment if creating an SA resource
+    scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+  }
+
+  # (Optional) labels for housekeeping
+  labels = {
+    app    = "bindplane"
+    role   = "control-plane"
+    env    = "demo"
+  }
 }
 
 ############################################
