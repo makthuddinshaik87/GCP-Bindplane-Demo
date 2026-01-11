@@ -43,25 +43,14 @@ set -euo pipefail
 
 echo "Updating OS and installing prerequisites..."
 apt-get update -y
-apt-get install -y \
-  curl \
-  jq \
-  ca-certificates \
-  gnupg
-
-echo "Adding ObservIQ GPG key..."
-curl -fsSL https://packages.observiq.com/apt/repo-signing-key.gpg \
-  | gpg --dearmor -o /usr/share/keyrings/observiq.gpg
-
-echo "Adding ObservIQ APT repository..."
-echo "deb [signed-by=/usr/share/keyrings/observiq.gpg] https://packages.observiq.com/apt stable main" \
-  > /etc/apt/sources.list.d/observiq.list
-
-echo "Updating package index..."
-apt-get update -y
+apt-get install -y curl jq ca-certificates
 
 echo "Installing BindPlane Control Plane..."
-apt-get install -y bindplane
+curl -fsSlL https://storage.googleapis.com/bindplane-op-releases/bindplane/latest/install-linux.sh \
+  -o install-linux.sh
+
+bash install-linux.sh --version 1.96.7 --init
+rm -f install-linux.sh
 
 echo "Configuring BindPlane with Cloud SQL PostgreSQL..."
 bindplane setup \
