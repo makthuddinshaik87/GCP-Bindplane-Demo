@@ -1,71 +1,35 @@
 provider "google" {
-
   project = var.project_id
-
   region  = var.region
-
 }
- 
-# Enable Cloud SQL API
 
 resource "google_project_service" "sqladmin" {
-
   service = "sqladmin.googleapis.com"
-
 }
- 
-# Cloud SQL PostgreSQL instance
 
 resource "google_sql_database_instance" "postgres" {
-
   name             = "bp-postgres"
-
   database_version = "POSTGRES_14"
-
   region           = var.region
- 
+
   settings {
+    tier = "db-f1-micro"
 
-    tier = "db-f1-micro"   # Demo / free-tier friendly
- 
-    availability_type = "ZONAL"
- 
-    backup_configuration {
-
-      enabled = true
-
-    }
- 
     ip_configuration {
-
       ipv4_enabled = true
-
     }
-
   }
- 
-  depends_on = [google_project_service.sqladmin]
 
+  depends_on = [google_project_service.sqladmin]
 }
- 
-# Database
 
 resource "google_sql_database" "bindplane" {
-
   name     = "bindplane"
-
   instance = google_sql_database_instance.postgres.name
-
 }
- 
-# Database user
 
 resource "google_sql_user" "bindplane" {
-
   name     = "bindplane"
-
   instance = google_sql_database_instance.postgres.name
-
   password = var.db_password
-
 }
