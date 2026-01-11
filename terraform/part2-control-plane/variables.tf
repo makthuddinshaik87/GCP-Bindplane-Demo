@@ -1,8 +1,4 @@
 
-############################################
-# Variables (names must match TF_VAR_* in CI)
-############################################
-
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
@@ -26,7 +22,7 @@ variable "admin_password" {
 }
 
 variable "db_admin" {
-  description = "Database admin user"
+  description = "Database admin user (e.g., postgres)"
   type        = string
   sensitive   = true
 }
