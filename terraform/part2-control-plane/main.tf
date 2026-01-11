@@ -50,7 +50,7 @@ bindplane setup \
   --db-host ${data.terraform_remote_state.db.outputs.db_ip} \
   --db-port ${data.terraform_remote_state.db.outputs.db_port} \
   --db-user ${data.terraform_remote_state.db.outputs.db_user} \
-  --db-password ${var.db_password} \
+  --db-password ${var.DB_PASSWORD} \
   --db-name ${data.terraform_remote_state.db.outputs.db_name} \
   --admin-password ${var.admin_password}
 
