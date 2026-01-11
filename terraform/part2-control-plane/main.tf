@@ -71,6 +71,7 @@ resource "google_compute_instance" "control_plane" {
   }
 }
 
+
 ############################################
 # Wait until Control Plane is reachable
 ############################################
@@ -102,6 +103,7 @@ resource "null_resource" "wait_until_up" {
     }
   }
 }
+
 
 ############################################
 # Outputs
