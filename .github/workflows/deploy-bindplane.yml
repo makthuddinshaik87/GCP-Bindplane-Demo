@@ -12,7 +12,7 @@ env:
   TF_VAR_region:         ${{ secrets.GCP_REGION }}
   TF_VAR_db_password:    ${{ secrets.DB_PASSWORD }}
   TF_VAR_admin_password: ${{ secrets.BINDPLANE_ADMIN_PASSWORD }}
-  TF_VAR_db_admin:       ${{ secrets.DB_ADMIN }}     # <-- ADD this repo secret (e.g., db admin username)
+  TF_VAR_db_admin:       ${{ secrets.DB_ADMIN }}     # ADD this repo secret (e.g., db admin username)
 
 # =========================================================
 # PART 1 – CLOUD SQL POSTGRESQL
@@ -64,7 +64,6 @@ jobs:
 
 # =========================================================
 # PART 2 – BINDPLANE CONTROL PLANE
-# (UPDATED: fixed curl redirect; environment already includes TF_VAR_db_admin)
 # =========================================================
   part2-control-plane:
     name: Part 2 – BindPlane Control Plane (Wait Until ACTIVE)
@@ -99,7 +98,7 @@ jobs:
           CP_IP=$(terraform output -raw control_plane_ip)
           echo "Waiting for BindPlane UI on http://$CP_IP:3001"
           for i in {1..30}; do
-            if curl -sf "http://$CP_IP:3001" >/dev/null; then  # <-- fixed: proper shell redirect
+            if curl -sf "http://$CP_IP:3001" >/dev/null; then  # fixed: proper shell redirect
               echo "BindPlane Control Plane is ACTIVE"
               exit 0
             fi
@@ -111,7 +110,6 @@ jobs:
 
 # =========================================================
 # PART 3 – BINDPLANE AGENT
-# (UPDATED: minor quoting; consistent with CP output usage)
 # =========================================================
   part3-agents:
     name: Part 3 – BindPlane Agent (Wait Until ACTIVE)
