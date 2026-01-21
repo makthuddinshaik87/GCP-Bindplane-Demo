@@ -116,12 +116,47 @@ jobs:
         working-directory: terraform/part2-control-plane
         run: terraform apply -auto-approve
 
+      # - name: Wait until BindPlane Control Plane is ACTIVE
+      #   working-directory: terraform/part2-control-plane
+      #   run: |
+      #     CP_IP=$(terraform output -raw control_plane_ip)
+      #     echo "Waiting for BindPlane UI on http://$CP_IP:3001"
+
       - name: Wait until BindPlane Control Plane is ACTIVE
         working-directory: terraform/part2-control-plane
+        env:
+          MAX_TRIES: "30"       # ~7.5 minutes at 15s interval
+          SLEEP_SEC: "15"
         run: |
-          CP_IP=$(terraform output -raw control_plane_ip)
-          echo "Waiting for BindPlane UI on http://$CP_IP:3001"
+          set -euo pipefail
 
+          CP_IP="$(terraform output -raw control_plane_ip)"
+          if [[ -z "${CP_IP}" ]]; then
+            echo "ERROR: terraform output control_plane_ip is empty"
+            exit 1
+          fi
+
+          echo "Waiting for BindPlane UI on http://${CP_IP}:3001"
+          for ((i=1; i<=MAX_TRIES; i++)); do
+            # Try to fetch just the headers quickly; follow redirects; fail on non-2xx/3xx
+            if curl -sS -f -L -o /dev/null \
+                 --max-time 5 \
+                 --connect-timeout 3 \
+                 "http://${CP_IP}:3001"; then
+              echo "BindPlane Control Plane is ACTIVE (try ${i}/${MAX_TRIES})"
+              exit 0
+            else
+              # For diagnosis, capture status code if reachable
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+                         --max-time 5 --connect-timeout 3 \
+                         "http://${CP_IP}:3001" || true)
+              echo "Not ready yet (try ${i}/${MAX_TRIES}). HTTP ${STATUS:-N/A}. Retrying in ${SLEEP_SEC}s…"
+            fi
+            sleep "${SLEEP_SEC}"
+          done
+
+          echo "Control Plane did not become ACTIVE after $((MAX_TRIES*SLEEP_SEC)) seconds."
+          exit 1
 
 # =========================================================
 #  BINDPLANE AGENT
