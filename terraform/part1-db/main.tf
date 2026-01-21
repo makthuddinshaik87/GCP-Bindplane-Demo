@@ -23,13 +23,13 @@ resource "google_sql_database_instance" "postgres" {
   depends_on = [google_project_service.sqladmin]
 }
 
-resource "google_sql_database" "bindplane" {
-  name     = "bindplane"
+resource "google_sql_database" "bindplane1" {
+  name     = "bindplane1"
   instance = google_sql_database_instance.postgres.name
 }
 
-resource "google_sql_user" "bindplane" {
-  name     = "bindplane"
+resource "google_sql_user" "bindplane1" {
+  name     = "bindplane1"
   instance = google_sql_database_instance.postgres.name
   password = var.db_password
 }
