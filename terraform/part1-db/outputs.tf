@@ -7,9 +7,9 @@ output "db_port" {
 }
 
 output "db_name" {
-  value = google_sql_database.bindplane.name
+  value = google_sql_database.bindplane1.name
 }
 
 output "db_user" {
-  value = google_sql_user.bindplane.name
+  value = google_sql_user.bindplane1.name
 }
